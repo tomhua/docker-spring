@@ -1,0 +1,27 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: config
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/
+          default-label: master
+        bootstrap: true
+        git:
+          uri: https://gitee.com/guanhua/docker_repo.git
+          username: zgguanhua@163.com
+          password: guanhua19911113
+          basedir: ./dockerConfig/file/config-repo
+  profiles:
+    active: native
+info:
+  eureka:
+    host: eureka
+    port: 5566
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${info.eureka.host}:${info.eureka.port}/eureka/

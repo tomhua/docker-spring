@@ -1,0 +1,36 @@
+server:
+  port: 5588
+
+info:
+  eureka:
+    host: eureka
+    port: 5566
+
+spring:
+  application:
+    name: admin
+  security:
+    user:
+      name: admin
+      password: 123456
+  cloud:
+    config:
+      discovery:
+        service-id: config
+        enabled: true
+      profile: dev
+      label: master
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${info.eureka.host}:${info.eureka.port}/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS

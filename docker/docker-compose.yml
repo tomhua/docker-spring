@@ -1,0 +1,105 @@
+version: '3'
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_USER: guanhua
+      MYSQL_PASS: guanhua@123
+    hostname: db
+    privileged: true
+    restart: always
+    volumes:
+      - "./mysql/db:/var/lib/mysql"
+      - "./mysql/conf/my.cnf:/etc/my.cnf"
+      - "./mysql/init:/docker-entrypoint-initdb.d/"
+    networks:
+      - docker_net
+    ports:
+      - "3306:3306"
+  redis:
+    image: redis:latest
+    hostname: redis
+    privileged: true
+    restart: always
+    volumes:
+      - ./redis/data:/data
+    command: "redis-server --appendonly yes"
+    networks:
+      - docker_net
+    ports:
+      - "6379:6379"
+  eureka:
+    build: ../docker-eureka
+    hostname: eureka
+    restart: always
+    networks:
+      - docker_net
+    ports:
+      - "5566:5566"
+  config:
+    build: ../docker-config
+    hostname: config
+    restart: always
+    networks:
+      - docker_net
+    ports:
+      - "8888:8888"
+    links:
+      - eureka
+  admin:
+    build: ../docker-admin
+    hostname: admin
+    restart: always
+    networks:
+      - docker_net
+    ports:
+      - "5588:5588"
+    links:
+      - eureka
+      - config
+      - userservice
+      - systemservice
+  userservice:
+    build: ../docker-user/user-service
+    hostname: userservice
+    restart: always
+    networks:
+      - docker_net
+    ports:
+      - "8820:8820"
+    links:
+      - eureka
+      - config
+      - db
+  systemservice:
+    build: ../docker-system/system-service
+    hostname: systemservice
+    restart: always
+    networks:
+      - docker_net
+    ports:
+      - "8810:8810"
+    links:
+      - eureka
+      - config
+      - db
+  gateway:
+    build: ../docker-gateway
+    hostname: gateway
+    restart: always
+    networks:
+      - docker_net
+    ports:
+      - 8800:8800
+    links:
+      - eureka
+      - config
+      - userservice
+      - systemservice
+networks:
+  docker_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

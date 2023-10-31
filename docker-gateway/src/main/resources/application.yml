@@ -1,0 +1,26 @@
+server:
+  port: 8800
+info:
+  eureka:
+    host: eureka
+    port: 5566
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      loadbalancer:
+        retry:
+          enabled: true
+      routes:
+        - id: user
+          uri: 
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${info.eureka.host}:${info.eureka.port}/eureka/
